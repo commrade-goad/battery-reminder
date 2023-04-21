@@ -1,7 +1,7 @@
 # battery-reminder
 a Battery reminder program that i write in C++/CPP
 
-## WARING
+## WARNING
 this is just for fun project that not optimized at all.
 
 ## BUILD
