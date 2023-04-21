@@ -122,7 +122,6 @@ int main () {
                 break;
             case 'F':
                 cout << "Full!\nsleeping for : " << SLEEP_TIME_LONG << endl;
-                spawn_process(cargs);
                 sleep(SLEEP_TIME_LONG);
                 break;
             default:
