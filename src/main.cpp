@@ -21,7 +21,7 @@ typedef struct {
 batt_percentage read_batt_percentage () {
     batt_percentage data;
     const char* pathToFile = PATH_TO_BATT_CAPACITY;
-    char* percentage = new char[4];
+    char* percentage = new char[5];
     FILE * pFile;
     pFile = fopen(pathToFile, "r");
     if (pFile == NULL) {
@@ -29,7 +29,7 @@ batt_percentage read_batt_percentage () {
         data.data = 0;
     } else {
         while (!feof(pFile)){
-            if (fgets(percentage, 4, pFile) == NULL) break;
+            if (fgets(percentage, 5, pFile) == NULL) break;
         }
         fclose(pFile);
         data.success = true;
@@ -89,11 +89,11 @@ int main () {
         char message[100];
         sprintf(message, NOTIFICATION, battPercentageData.data);
 
-        const char * spawn_dunst[] = {"/usr/bin/dunstify", "--appname=Battery", "-u", "2", "-t", "10000", message, NULL};
-        const int nargs = sizeof(spawn_dunst) / sizeof(spawn_dunst[0]) - 1;
+        const char * spawn_notif[] = {"/usr/bin/notify-send", "--app-name=Battery", "-u", "critical", "-t", "10000", message, NULL};
+        const int nargs = sizeof(spawn_notif) / sizeof(spawn_notif[0]) - 1;
         char* cargs[nargs];
         for (int i = 0; i < nargs; ++i) {
-            cargs[i] = const_cast<char*>(spawn_dunst[i]);
+            cargs[i] = const_cast<char*>(spawn_notif[i]);
         }
         switch (battStatusData.data){
             case 'C':
@@ -122,6 +122,7 @@ int main () {
                 break;
             case 'F':
                 cout << "Full!\nsleeping for : " << SLEEP_TIME_LONG << endl;
+                spawn_process(cargs);
                 sleep(SLEEP_TIME_LONG);
                 break;
             default:

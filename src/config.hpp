@@ -2,11 +2,11 @@
 #define CONFIG_HPP
 
 // Path to BAT dir
-const char* PATH_TO_BATT_CAPACITY = "/sys/class/power_supply/BAT1/capacity";
-const char* PATH_TO_BATT_STATUS = "/sys/class/power_supply/BAT1/status";
+static const char* PATH_TO_BATT_CAPACITY = "/sys/class/power_supply/BAT1/capacity";
+static const char* PATH_TO_BATT_STATUS = "/sys/class/power_supply/BAT1/status";
 
 // Notifications Message
-const char* NOTIFICATION = "%d%% Battery Remaining. Please plug in the charger.";
+static const char* NOTIFICATION = "%d%% Battery Remaining. Please plug in the charger.";
 
 // Sleeping time configuration
 const int SLEEP_TIME_LONG = 300;
