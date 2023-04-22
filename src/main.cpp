@@ -102,6 +102,7 @@ int main () {
                 break;
             case 'D':
                 cout << "Discharging!\n";
+                cout << battPercentageData.data << "% ";
                 switch (battPercentageData.data) {
                     case BATT_LOW ... 100:
                         cout << "sleeping for : " << SLEEP_TIME_LONG << endl;
