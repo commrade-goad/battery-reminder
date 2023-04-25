@@ -1,12 +1,20 @@
 #include <iostream>
 #include <cstring>
+#include <filesystem>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <stdio.h>
 #include <string.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
+#include <iostream>
 #include "config.hpp"
 using namespace std;
+
+const int AUDIO_FREQUENCY = 44100;
+const int AUDIO_CHANNELS = 2;
+const int AUDIO_CHUNKSIZE = 1024;
 
 typedef struct {
     bool success;
@@ -60,6 +68,50 @@ batt_status read_batt_status () {
     return data;
 }
 
+int play_audio(const char* pathToFile) {
+    if (!filesystem::exists(pathToFile)) return 1;
+    if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+        cout << "ERROR : Failed to initialize SDL audio system: " << SDL_GetError() << endl;
+        return 1;
+    }
+        if (Mix_OpenAudio(AUDIO_FREQUENCY, MIX_DEFAULT_FORMAT, AUDIO_CHANNELS, AUDIO_CHUNKSIZE) < 0) {
+        cout << "ERROR : Failed to open audio device: " << Mix_GetError() << endl;
+        return 1;
+    }
+
+    const char* audioExt = strchr(pathToFile, '.');
+    if (strstr(audioExt, "mp3")) {
+        Mix_Music* audio = Mix_LoadMUS(pathToFile);
+        if (!audio) {
+            cout << "ERROR : Failed to load audio file: " << Mix_GetError() << endl;
+            return 1;
+        }
+        Mix_PlayMusic(audio, 0);
+        while (Mix_PlayingMusic()) {
+            SDL_Delay(100);
+        }
+        Mix_FreeMusic(audio);
+    } else if (strstr(audioExt, "wav")) {
+        Mix_Chunk* audio = Mix_LoadWAV(pathToFile);
+        if (!audio) {
+            cout << "ERROR : Failed to load audio file: " << Mix_GetError() << endl;
+            return 1;
+        }
+        Mix_PlayChannel(-1, audio, 0);
+        while (Mix_Playing(-1)) {
+            SDL_Delay(100);
+        }
+        Mix_FreeChunk(audio);
+    } else {
+        cout << "ERROR : Unsupported audio format " << audioExt << endl;
+        return 1;
+    }
+    Mix_CloseAudio();
+    SDL_Quit();
+
+    return 0;
+}
+
 int spawn_process(char* args[]) {
     pid_t pid = fork();
     if (pid == 0) {
@@ -78,6 +130,7 @@ int spawn_process(char* args[]) {
 }
 
 int main () {
+    if (play_audio(PATH_TO_AUDIO_FILE) !=0) cout << "Failed to play audio!\n";
     bool running = true;
     while (running == true) {
         batt_percentage battPercentageData = read_batt_percentage();
@@ -115,6 +168,7 @@ int main () {
                     case 1 ... BATT_CRITICAL-1 :
                         cout << "sleeping for : " << SLEEP_TIME_NORMAL << endl;
                         spawn_process(cargs);
+                        if (play_audio(PATH_TO_AUDIO_FILE) !=0) cout << "Failed to play audio!\n";
                         sleep(SLEEP_TIME_NORMAL);
                         break;
                     default:
