@@ -1,8 +1,8 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-// Path to mp3 file
-static const char* PATH_TO_AUDIO_FILE = "/home/fernando/git/rust-batt-reminder/assets/notification_sound.mp3";
+// Path to audio file
+static const char* PATH_TO_AUDIO_FILE = "/absolute/path/to/file.mp3";
 
 // Path to BAT dir
 static const char* PATH_TO_BATT_CAPACITY = "/sys/class/power_supply/BAT1/capacity";
